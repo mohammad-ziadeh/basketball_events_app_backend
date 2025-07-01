@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\CustomPlayerController;
 use App\Http\Controllers\Api\MatchupController;
+use App\Http\Controllers\Api\LeaderboardController;
 use App\Http\Controllers\Api\MatchSummaryController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\PlayerController;
@@ -78,6 +79,9 @@ Route::get('/players/suggestions', [PlayerController::class, 'suggestions']);
 Route::get('/matchups/{matchup}/summary', [MatchSummaryController::class, 'show']);
 
 
+
+Route::get('/leaderboard/players', [LeaderboardController::class, 'playerLeaderboard']);
+Route::get('/leaderboard/teams', [LeaderboardController::class, 'teamLeaderboard']);
 
 
 Route::get('/next-events/search', [NextEventController::class, 'search']);

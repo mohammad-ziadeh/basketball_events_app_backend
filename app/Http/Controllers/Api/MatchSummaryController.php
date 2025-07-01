@@ -19,11 +19,9 @@ class MatchSummaryController extends Controller
 
         $stats = $matchup->stats;
 
-        // Top scorer and assist player
         $topScorer = $stats->sortByDesc('points')->first();
         $topAssist = $stats->sortByDesc('assists')->first();
 
-        // Calculate team points and fouls
         $teamPoints = ['A' => 0, 'B' => 0];
         $teamFouls = ['A' => 0, 'B' => 0];
 
@@ -94,4 +92,7 @@ class MatchSummaryController extends Controller
             })->values(),
         ]);
     }
+
+
+
 }

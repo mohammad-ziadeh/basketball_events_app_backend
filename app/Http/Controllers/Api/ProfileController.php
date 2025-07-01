@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+
 
 class ProfileController extends Controller
 {
@@ -15,7 +17,6 @@ class ProfileController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Load relationships
         $user->load([
             'player.team',
             'player.events' => function ($query) {
@@ -38,6 +39,13 @@ class ProfileController extends Controller
             });
         }
 
+        $allPlayers = User::where('role', 'player')
+            ->orderByDesc('points')
+            ->pluck('id');
+
+        $rankIndex = $allPlayers->search($user->id);
+        $rank = $rankIndex === false ? null : $rankIndex + 1;
+
         return response()->json([
             'id' => $user->id,
             'first_name' => $user->first_name,
@@ -48,7 +56,7 @@ class ProfileController extends Controller
             'birth_date' => $user->birth_date,
             'role' => $user->role,
             'points' => $user->points ?? 0,
-            'rank' => $user->rank_title,
+            'rank' => $rank ? (string)$rank : 'N/A', 
             'avatar_url' => $user->avatar_url,
             'background_url' => $user->background_url,
             'events' => $events,
@@ -56,35 +64,36 @@ class ProfileController extends Controller
         ]);
     }
 
+
     protected function getBadges($user)
     {
         $points = $user->points ?? 0;
 
         return [
             ['title' => 'Rookie', 'unlocked' => $points >= 0],
-            ['title' => 'Pro Player', 'unlocked' => $points >= 100],
-            ['title' => 'All-Star', 'unlocked' => $points >= 200],
-            ['title' => 'Elite', 'unlocked' => $points >= 350],
-            ['title' => 'Legend', 'unlocked' => $points >= 500],
+            ['title' => 'Pro Player', 'unlocked' => $points >= 35],
+            ['title' => 'All-Star', 'unlocked' => $points >= 70],
+            ['title' => 'Elite', 'unlocked' => $points >= 100],
+            ['title' => 'Legend', 'unlocked' => $points >= 150],
         ];
     }
 
 
 
-public function uploadImage(Request $request)
-{
-    $request->validate([
-        'type' => 'required|in:avatar_url,background_url',
-        'image' => 'required|image|max:2048',
-    ]);
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:avatar_url,background_url',
+            'image' => 'required|image|max:2048',
+        ]);
 
-    $user = \App\Models\User::find(auth()->id());
+        $user = \App\Models\User::find(auth()->id());
 
-    $path = $request->file('image')->store('profile_images', 'public');
+        $path = $request->file('image')->store('profile_images', 'public');
 
-    $user->{$request->type} = asset('storage/' . $path);
-    $user->save();
+        $user->{$request->type} = asset('storage/' . $path);
+        $user->save();
 
-    return response()->json(['message' => 'Image updated successfully']);
-}
+        return response()->json(['message' => 'Image updated successfully']);
+    }
 }

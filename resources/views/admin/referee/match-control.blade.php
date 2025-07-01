@@ -149,10 +149,11 @@
             <div class="card-body">
                 <h5>Set Winning Team</h5>
                 <form method="POST" action="{{ route('referee.setWinner', $matchup->id) }}"
-                    class="row align-items-center mt-3" style="display: flex; justify-content: space-between; padding: 0 60px;">
+                    class="row align-items-center mt-3"
+                    style="display: flex; justify-content: space-between; padding: 0 60px;">
                     @csrf
 
-                    <select name="winner_team_id" class="form-select">
+                    <select name="winner_team_id" class="form-select" style="width: 200px; margin-right: 20px;">
                         <option value="{{ $matchup->teamA->id }}"
                             {{ $matchup->winner_team_id == $matchup->teamA->id ? 'selected' : '' }}>
                             {{ $matchup->teamA->name }}
@@ -162,7 +163,7 @@
                             {{ $matchup->teamB->name }}
                         </option>
                     </select>
-                    <button class="btn btn-success">Confirm Winner</button>
+                    <button class="btn btn-success" style="width: 150px;">Confirm Winner</button>
                 </form>
             </div>
         </div>
@@ -202,8 +203,7 @@
     @endif
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/intro.js@4/intro.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@4/themes/introjs.css">
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 
     <script>
         function confirmReset(id) {

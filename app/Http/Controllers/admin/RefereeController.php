@@ -28,8 +28,8 @@ class RefereeController extends Controller
     public function assignActivePlayers(Request $request, Matchup $matchup)
     {
         $request->validate([
-            'team_a_players' => 'required|array|size:4',
-            'team_b_players' => 'required|array|size:4',
+            'team_a_players' => 'required|array|min:2|max:4',
+            'team_b_players' => 'required|array|min:2|max:4',
         ]);
 
         $matchup->activePlayers()->delete();

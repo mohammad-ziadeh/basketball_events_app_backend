@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
         $table->foreignId('team_id')->constrained()->onDelete('cascade');
-        $table->string('role'); // e.g., defender, striker, etc.
+        $table->string('role');
         $table->timestamps();
     });
 }

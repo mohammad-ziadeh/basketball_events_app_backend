@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('matchup_id')->constrained()->onDelete('cascade');
             $table->foreignId('player_id')->constrained('players')->onDelete('cascade');
-            $table->enum('team_side', ['A', 'B']); // active players only
+            $table->enum('team_side', ['A', 'B']);
             $table->timestamps();
         });
     }
