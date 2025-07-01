@@ -8,19 +8,52 @@ use Illuminate\Database\Eloquent\Model;
 class Matchup extends Model
 {
     protected $fillable = [
-        'event_id', 'team_a_id', 'team_b_id', 'match_time', 'location', 'round'
+        'event_id',
+        'team_a_id',
+        'team_b_id',
+        'match_time',
+        'location',
+        'round',
+        'start_time',
+        'duration',
+        'winner_team_id',
     ];
 
-    public function teamA() {
+    protected $casts = [
+        'match_time' => 'datetime',
+        'start_time' => 'datetime',
+        'duration' => 'time', 
+    ];
+
+    public function teamA()
+    {
         return $this->belongsTo(Team::class, 'team_a_id');
     }
 
-    public function teamB() {
+    public function teamB()
+    {
         return $this->belongsTo(Team::class, 'team_b_id');
     }
 
-    public function event() {
+    public function event()
+    {
         return $this->belongsTo(NextEvent::class, 'event_id');
     }
-}
 
+
+
+    public function activePlayers()
+    {
+        return $this->hasMany(MatchupPlayer::class);
+    }
+
+    public function stats()
+    {
+        return $this->hasMany(MatchStat::class);
+    }
+
+    public function winner()
+    {
+        return $this->belongsTo(Team::class, 'winner_team_id');
+    }
+}

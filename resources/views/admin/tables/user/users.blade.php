@@ -120,15 +120,12 @@
     @include('admin.tables.user.user-create-modal')
 
 
-    <!-- External Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/intro.js@4/intro.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@4/themes/introjs.css">
 
-    <!-- Custom Scripts -->
     <script>
-        // Confirm Delete (Soft Delete)
         function confirmDelete(id) {
             Swal.fire({
                 title: "Are you sure?",
@@ -144,7 +141,6 @@
             });
         }
 
-        // Confirm Permanent Delete
         function confirmPerDelete(id) {
             Swal.fire({
                 title: "Delete permanently?",
@@ -161,7 +157,6 @@
             });
         }
 
-        // Fade alerts after 3 seconds
         $(document).ready(function() {
             setTimeout(() => {
                 $('#successMessage').fadeOut('slow');
@@ -169,7 +164,6 @@
             }, 3000);
         });
 
-        // Optional: Tour Button
         function startTour() {
             introJs().start();
         }

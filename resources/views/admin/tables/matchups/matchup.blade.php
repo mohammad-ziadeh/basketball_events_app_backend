@@ -1,4 +1,3 @@
-{{-- resources/views/admin/tables/matchups/index.blade.php --}}
 
 <x-app-layout>
     <x-slot name="header">
@@ -11,7 +10,6 @@
     @include('components.alerts')
 
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6" style="margin-top: 50px;">
-        <!-- Filters -->
         <form method="GET" action="{{ route('matchups.index') }}" class="mb-4">
             <div class="row g-3">
                 <div class="col-md-4">
@@ -84,14 +82,28 @@
                                 <tbody>
                                     @foreach ($event->matchups as $matchup)
                                         <tr>
-                                            <td>{{ $matchup->teamA->name }}</td>
+                                            <td>
+                                                <a href="{{ route('referee.control', $matchup->id) }}"
+                                                    class="text-decoration-none">
+                                                    {{ $matchup->teamA->name }}
+                                                </a>
+                                            </td>
                                             <td class="text-center fw-bold">VS</td>
-                                            <td>{{ $matchup->teamB->name }}</td>
+                                            <td>
+                                                <a href="{{ route('referee.control', $matchup->id) }}"
+                                                    class="text-decoration-none">
+                                                    {{ $matchup->teamB->name }}
+                                                </a>
+                                            </td>
                                             <td>{{ $matchup->match_time ? \Carbon\Carbon::parse($matchup->match_time)->format('Y-m-d H:i') : '—' }}
                                             </td>
                                             <td>{{ $matchup->round ?? '—' }}</td>
                                             <td>
-                                                <button class="btn btn-sm btn-warning" data-toggle="modal"
+                                                <a href="{{ route('referee.control', $matchup->id) }}"
+                                                    class="btn btn-sm btn-success">
+                                                    Control Match
+                                                </a>
+                                               <button class="btn btn-sm btn-warning" data-toggle="modal"
                                                     data-target="#editMatchupModal{{ $matchup->id }}">
                                                     Edit
                                                 </button>
@@ -105,8 +117,7 @@
                                                 </form>
                                             </td>
                                         </tr>
-
-                                        @include('admin.tables.matchups.matchup-edit-modal', [
+                                          @include('admin.tables.matchups.matchup-edit-modal', [
                                             'matchup' => $matchup,
                                             'teams' => $event->teams,
                                         ])

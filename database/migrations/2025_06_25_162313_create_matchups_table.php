@@ -21,6 +21,9 @@ return new class extends Migration
             $table->timestamp('match_time')->nullable();
             $table->string('location')->nullable();
             $table->string('round')->nullable();
+            $table->timestamp('start_time')->nullable();
+            $table->time('duration')->nullable();
+            $table->foreignId('winner_team_id')->nullable()->constrained('teams')->nullOnDelete();
             $table->timestamps();
         });
     }

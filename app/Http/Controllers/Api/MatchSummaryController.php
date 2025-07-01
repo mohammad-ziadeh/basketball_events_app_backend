@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Matchup;
+
+class MatchSummaryController extends Controller
+{
+    public function show($matchupId)
+    {
+        $matchup = Matchup::with([
+            'teamA',
+            'teamB',
+            'winner',
+            'stats.player.user',
+            'activePlayers'
+        ])->findOrFail($matchupId);
+
+        $stats = $matchup->stats;
+
+        // Top scorer and assist player
+        $topScorer = $stats->sortByDesc('points')->first();
+        $topAssist = $stats->sortByDesc('assists')->first();
+
+        // Calculate team points and fouls
+        $teamPoints = ['A' => 0, 'B' => 0];
+        $teamFouls = ['A' => 0, 'B' => 0];
+
+        foreach ($stats as $stat) {
+            $active = $matchup->activePlayers
+                ->firstWhere('player_id', $stat->player_id);
+
+            if ($active) {
+                $side = $active->team_side;
+                $teamPoints[$side] += $stat->points;
+                $teamFouls[$side] += $stat->fouls;
+            }
+        }
+
+        return response()->json([
+            'match_time' => optional($matchup->match_time)->toIso8601String(),
+            'team_a_name' => $matchup->teamA->name,
+            'team_b_name' => $matchup->teamB->name,
+            'winner_team' => $matchup->winner?->name,
+
+            'top_score_player' => $topScorer ? [
+                'player_id' => $topScorer->player->id,
+                'player_name' => $topScorer->player->user->name,
+                'points' => $topScorer->points,
+                'assists' => $topScorer->assists,
+                'fouls' => $topScorer->fouls,
+            ] : null,
+
+            'top_assist_player' => $topAssist ? [
+                'player_id' => $topAssist->player->id,
+                'player_name' => $topAssist->player->user->name,
+                'points' => $topAssist->points,
+                'assists' => $topAssist->assists,
+                'fouls' => $topAssist->fouls,
+            ] : null,
+
+            'most_foul_team' => $teamFouls['A'] > $teamFouls['B']
+                ? [
+                    'team_id' => $matchup->teamA->id,
+                    'team_name' => $matchup->teamA->name,
+                    'fouls' => $teamFouls['A'],
+                ]
+                : ($teamFouls['B'] > $teamFouls['A'] ? [
+                    'team_id' => $matchup->teamB->id,
+                    'team_name' => $matchup->teamB->name,
+                    'fouls' => $teamFouls['B'],
+                ] : null),
+
+            'team_a_points' => [
+                'team_id' => $matchup->teamA->id,
+                'team_name' => $matchup->teamA->name,
+                'points' => $teamPoints['A'],
+            ],
+            'team_b_points' => [
+                'team_id' => $matchup->teamB->id,
+                'team_name' => $matchup->teamB->name,
+                'points' => $teamPoints['B'],
+            ],
+
+            'all_player_stats' => $stats->map(function ($stat) {
+                return [
+                    'player_id' => $stat->player->id,
+                    'player_name' => $stat->player->user->name,
+                    'points' => $stat->points,
+                    'assists' => $stat->assists,
+                    'fouls' => $stat->fouls,
+                ];
+            })->values(),
+        ]);
+    }
+}

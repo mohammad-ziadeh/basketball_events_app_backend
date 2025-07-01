@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\CustomPlayerController;
 use App\Http\Controllers\Api\MatchupController;
+use App\Http\Controllers\Api\MatchSummaryController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\NextEventController;
@@ -72,6 +73,9 @@ Route::delete('/teams/{team}/players/{player}', [PlayerController::class, 'destr
 Route::get('/players/search', [PlayerController::class, 'search']);
 Route::get('/players/suggestions', [PlayerController::class, 'suggestions']);
 
+
+
+Route::get('/matchups/{matchup}/summary', [MatchSummaryController::class, 'show']);
 
 
 
