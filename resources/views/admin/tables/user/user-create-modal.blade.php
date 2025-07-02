@@ -15,7 +15,6 @@
                 @csrf
 
                 <div class="modal-body" style="padding: 0 1.5rem 1rem;">
-                    <!-- First Name & Last Name -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="first_name" class="form-label" style="color: #000000;">First Name</label>
@@ -29,14 +28,12 @@
                         </div>
                     </div>
 
-                    <!-- Email -->
                     <div class="form-group mb-3">
                         <label for="email" class="form-label" style="color: #000000;">Email Address</label>
                         <input type="email" class="form-control" name="email" value="{{ old('email') }}" required
                             style="border: 1px solid #ced4da; border-radius: 4px; padding: 0.375rem 0.75rem;">
                     </div>
 
-                    <!-- Password -->
                     <div class="form-group mb-3">
                         <label for="password" class="form-label" style="color: #000000;">Password</label>
                         <input type="password" class="form-control" name="password" required
@@ -44,7 +41,6 @@
                             style="border: 1px solid #ced4da; border-radius: 4px; padding: 0.375rem 0.75rem;">
                     </div>
 
-                    <!-- Phone & Birth Date -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="phone" class="form-label" style="color: #000000;">Phone</label>
@@ -58,7 +54,6 @@
                         </div>
                     </div>
 
-                    <!-- Gender & Role -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="gender" class="form-label" style="color: #000000;">Gender</label>

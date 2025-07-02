@@ -61,13 +61,10 @@ Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index'
 
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show']);     // GET /api/profile
+    Route::get('/profile', [ProfileController::class, 'show']);
     Route::post('/profile/upload-image', [ProfileController::class, 'uploadImage']);
-    // PUT /api/profile
 });
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::post('/teams/{teamId}/custom-players', [CustomPlayerController::class, 'store']);
-// });
+Route::get('/player-profile/{id}', [ProfileController::class, 'showPlayerProfile']);
 
 
 Route::delete('/teams/{team}/players/{player}', [PlayerController::class, 'destroy']);

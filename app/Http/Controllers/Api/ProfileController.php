@@ -56,7 +56,7 @@ class ProfileController extends Controller
             'birth_date' => $user->birth_date,
             'role' => $user->role,
             'points' => $user->points ?? 0,
-            'rank' => $rank ? (string)$rank : 'N/A', 
+            'rank' => $rank ? (string)$rank : 'N/A',
             'avatar_url' => $user->avatar_url,
             'background_url' => $user->background_url,
             'events' => $events,
@@ -95,5 +95,60 @@ class ProfileController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Image updated successfully']);
+    }
+
+
+
+    public function showPlayerProfile($id)
+    {
+        $user = User::with([
+            'player.team',
+            'player.events' => function ($query) {
+                $query->withPivot('points');
+            }
+        ])->find($id);
+
+        if (!$user) {
+            return response()->json(['error' => 'Player not found'], 404);
+        }
+
+        $player = $user->player;
+
+        $events = [];
+
+        if ($player) {
+            $events = $player->events->map(function ($event) use ($player) {
+                return [
+                    'event_name' => $event->title,
+                    'points' => $event->pivot->points ?? 0,
+                    'team_name' => $player->team?->name ?? null,
+                    'date_range' => $event->start_date->format('M d, Y') . ' - ' . $event->end_date->format('M d, Y'),
+                ];
+            });
+        }
+
+        $allPlayers = User::where('role', 'player')
+            ->orderByDesc('points')
+            ->pluck('id');
+
+        $rankIndex = $allPlayers->search($user->id);
+        $rank = $rankIndex === false ? null : $rankIndex + 1;
+
+        return response()->json([
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'name' => $user->first_name . ' ' . $user->last_name,
+            'email' => $user->email,
+            'gender' => $user->gender,
+            'birth_date' => $user->birth_date,
+            'role' => $user->role,
+            'points' => $user->points ?? 0,
+            'rank' => $rank ? (string)$rank : 'N/A',
+            'avatar_url' => $user->avatar_url,
+            'background_url' => $user->background_url,
+            'events' => $events,
+            'badges' => $this->getBadges($user),
+        ]);
     }
 }

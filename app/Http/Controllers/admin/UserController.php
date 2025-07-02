@@ -75,7 +75,9 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make('123456789'),
             'gender' => $request->gender,
+            'phone' => $request->phone,
             'birth_date' => $request->birth_date,
+            'name' => $request->first_name . ' ' . $request->last_name,
         ]);
 
         return redirect('users')->with('success', 'User stored successfully.');
@@ -112,6 +114,8 @@ class UserController extends Controller
             'email' => $request->email,
             'gender' => $request->gender,
             'birth_date' => $request->birth_date,
+            'phone' => $request->phone,
+            'name' => $request->first_name . ' ' . $request->last_name,
         ];
 
         if ($request->filled('password')) {

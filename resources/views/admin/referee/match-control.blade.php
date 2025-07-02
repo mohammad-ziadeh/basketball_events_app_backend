@@ -98,6 +98,8 @@
                         <div class="col-md-6">
                             <h6 class="text-primary" style="font-size: 1.25rem; text-align: center;">
                                 {{ $team->name }}</h6>
+                            <h6 class="text-primary" style="font-size: 1.25rem; text-align: center;">
+                                {{ $team->points }}</h6>
                             @foreach ($matchup->activePlayers->where('team_side', $side) as $assignment)
                                 @php
                                     $player = $assignment->player;
