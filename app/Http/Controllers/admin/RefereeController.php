@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -83,7 +82,6 @@ class RefereeController extends Controller
         $diff = $newPoints - $previousPoints;
 
         $player->user->increment('points', $diff);
-
         $player->team->increment('points', $diff);
 
         return back()->with('success', 'Match stats and totals updated successfully');
@@ -94,7 +92,6 @@ class RefereeController extends Controller
         $matchup->update(['start_time' => now()]);
         return back()->with('success', 'Match timer started');
     }
-
 
     public function resetMatchTimer(Matchup $matchup)
     {
@@ -111,5 +108,21 @@ class RefereeController extends Controller
         $matchup->update(['winner_team_id' => $request->winner_team_id]);
 
         return back()->with('success', 'Winner set');
+    }
+
+    public function showScoreboard(Matchup $matchup)
+    {
+
+        $matchup->load(['stats.player.team']);
+
+        $teamAFouls = $matchup->stats->filter(function ($stat) use ($matchup) {
+            return $stat->player && $stat->player->team_id === $matchup->team_a_id;
+        })->sum('fouls');
+
+        $teamBFouls = $matchup->stats->filter(function ($stat) use ($matchup) {
+            return $stat->player && $stat->player->team_id === $matchup->team_b_id;
+        })->sum('fouls');
+
+        return view('admin.referee.scoreboard', compact('matchup', 'teamAFouls', 'teamBFouls'));
     }
 }

@@ -75,6 +75,9 @@ Route::prefix('admin/referee')->group(function () {
     Route::post('/matchups/{matchup}/start-timer', [RefereeController::class, 'startMatchTimer'])->name('referee.startTimer');
     Route::post('/matchups/{matchup}/reset-timer', [RefereeController::class, 'resetMatchTimer'])->name('referee.resetTimer');
 
+
+    Route::get('/scoreboard/{matchup}', [RefereeController::class, 'showScoreboard'])->name('scoreboard.show');
+
     Route::post('/matchups/{matchup}/set-winner', [RefereeController::class, 'setWinner'])->name('referee.setWinner');
 });
 

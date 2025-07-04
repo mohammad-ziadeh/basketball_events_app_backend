@@ -18,7 +18,7 @@ class LeaderBoardController extends Controller
             ->get()
             ->map(function ($user) {
                 return [
-                    'player_id' => $user->player->id,
+                    'player_id' => $user->id,
                     'name' => $user->name,
                     'team_name' => $user->player->team->name ?? 'Unassigned',
                     'points' => $user->points,

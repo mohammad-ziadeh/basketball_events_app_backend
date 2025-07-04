@@ -14,6 +14,11 @@
 
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-5" style="margin-top: 30px;">
 
+        <div class="text-end mb-3">
+            <a href="{{ route('scoreboard.show', $matchup->id) }}" target="_blank" class="btn btn-dark">
+                <i class="bi bi-tv"></i> View Public Scoreboard
+            </a>
+        </div>
 
 
         <div class="card shadow-sm">
@@ -115,30 +120,48 @@
                                     </div>
 
                                     <form method="POST" action="{{ route('referee.updateStat') }}"
-                                        class="row mt-2 gx-2 gy-1 align-items-center">
+                                        class="row mt-2 gx-2 gy-1 align-items-center player-stat-form">
                                         @csrf
                                         <input type="hidden" name="matchup_id" value="{{ $matchup->id }}">
                                         <input type="hidden" name="player_id" value="{{ $player->id }}">
 
                                         <div class="col-4">
                                             <label class="form-label">Pts</label>
-                                            <input type="number" name="points" class="form-control form-control-sm"
-                                                value="{{ $stat->points ?? 0 }}" min="0">
+                                            <input type="number" name="points"
+                                                class="form-control form-control-lg points-input"
+                                                value="{{ $stat->points ?? 0 }}" min="0" >
+                                            <div class="mt-1 d-flex gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-success custom-size-btn add-points"
+                                                    data-value="1">+1</button>
+                                                <button type="button" class="btn btn-sm btn-outline-success custom-size-btn add-points"
+                                                    data-value="2">+2</button>
+                                            </div>
                                         </div>
                                         <div class="col-4">
                                             <label class="form-label">AST</label>
-                                            <input type="number" name="assists" class="form-control form-control-sm"
-                                                value="{{ $stat->assists ?? 0 }}" min="0">
+                                            <input type="number" name="assists"
+                                                class="form-control form-control-lg assists-input"
+                                                value="{{ $stat->assists ?? 0 }}" min="0" >
+                                            <div class="mt-1" style="display: flex; justify-content: center;">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-primary custom-size-btn add-assist">+1</button>
+                                            </div>
                                         </div>
                                         <div class="col-4">
                                             <label class="form-label">Fouls</label>
-                                            <input type="number" name="fouls" class="form-control form-control-sm"
-                                                value="{{ $stat->fouls ?? 0 }}" min="0">
+                                            <input type="number" name="fouls"
+                                                class="form-control form-control-lg fouls-input"
+                                                value="{{ $stat->fouls ?? 0 }}" min="0" >
+                                            <div class="mt-1" style="display: flex; justify-content: center;">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-danger custom-size-btn add-foul">+1</button>
+                                            </div>
                                         </div>
                                         <div class="col-12 text-end">
                                             <button class="btn btn-sm btn-outline-primary mt-2">Save</button>
                                         </div>
                                     </form>
+
                                 </div>
                             @endforeach
                         </div>
@@ -205,7 +228,8 @@
     @endif
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 
     <script>
         function confirmReset(id) {
@@ -231,4 +255,39 @@
             }, 3000);
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.add-points').forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('form');
+                    const pointsInput = form.querySelector('.points-input');
+                    const addValue = parseInt(this.getAttribute('data-value'));
+                    pointsInput.value = parseInt(pointsInput.value) + addValue;
+                });
+            });
+
+            document.querySelectorAll('.add-assist').forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('form');
+                    const assistInput = form.querySelector('.assists-input');
+                    assistInput.value = parseInt(assistInput.value) + 1;
+                });
+            });
+
+            document.querySelectorAll('.add-foul').forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('form');
+                    const foulInput = form.querySelector('.fouls-input');
+                    foulInput.value = parseInt(foulInput.value) + 1;
+                });
+            });
+        });
+    </script>
+<style>
+    .custom-size-btn {
+    min-width: 80px;   /* make button longer */
+    padding: 0.5rem 1.2rem;  /* increase height and horizontal padding */
+    font-size: 1rem;   /* keep font normal size */
+}
+</style>
 </x-app-layout>
