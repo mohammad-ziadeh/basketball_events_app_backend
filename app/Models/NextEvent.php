@@ -39,4 +39,10 @@ class NextEvent extends Model
     {
         return $this->hasMany(Matchup::class, 'event_id');
     }
+
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class, 'event_id');
+    }
 }

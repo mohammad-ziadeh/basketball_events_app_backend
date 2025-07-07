@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('location');
             $table->integer('points')->default(0);
             $table->foreignId('coach_id')->constrained('users')->onDelete('cascade');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

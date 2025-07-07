@@ -11,14 +11,15 @@ class MatchupController extends Controller
     public function index(Request $request)
     {
         $events = NextEvent::with([
-            'teams:id,name',              // only id and name
+            'teams:id,name,category_id',
+            'teams.category:id,name',
             'matchups' => function ($q) {
                 $q->select('id', 'event_id', 'team_a_id', 'team_b_id', 'match_time');
             },
             'matchups.teamA:id,name',
             'matchups.teamB:id,name',
         ])
-        ->get(['id', 'title', 'event_code']);
+            ->get(['id', 'title', 'event_code']);
 
         return response()->json($events);
     }

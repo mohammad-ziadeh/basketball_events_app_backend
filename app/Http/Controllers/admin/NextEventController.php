@@ -6,9 +6,11 @@ use App\Models\NextEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Category;
 use App\Notifications\CreatingEventNotification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class NextEventController extends Controller
 {
@@ -46,8 +48,9 @@ class NextEventController extends Controller
         // -------{{ End Filters }}------- //
 
         $events = $query->paginate(9);
+        $categories = Category::all();
 
-        return view('admin.tables.event.events', compact('events'));
+        return view('admin.tables.event.events', compact('events', 'categories'));
     }
 
     /**
@@ -70,6 +73,9 @@ class NextEventController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'event_code' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'categories' => 'required|array|min:1',
+            'categories.*.name' => 'required|string|max:255',
+            'categories.*.capacity' => 'nullable|integer|min:1|max:1000',
         ]);
 
         if ($validator->fails()) {
@@ -82,20 +88,31 @@ class NextEventController extends Controller
             $imageUrl = asset('storage/' . $path);
         }
 
-        $event = NextEvent::create([
-            'title' => $request->title,
-            'location' => $request->location,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'event_code' => $request->event_code,
-            'image_url' => $imageUrl,
-        ]);
+        $defaultCapacity = 12;
 
+        DB::transaction(function () use ($request, &$event, $imageUrl, $defaultCapacity) {
+            $event = NextEvent::create([
+                'title' => $request->title,
+                'location' => $request->location,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'event_code' => $request->event_code,
+                'image_url' => $imageUrl,
+            ]);
 
-        $users = User::all();
-        foreach ($users as $user) {
-            $user->notify(new CreatingEventNotification($event));
-        }
+            foreach ($request->categories as $categoryData) {
+                $event->categories()->create([
+                    'name' => $categoryData['name'],
+                    'capacity' => $categoryData['capacity'] ?? $defaultCapacity,
+                ]);
+            }
+
+            // Notify users
+            $users = User::all();
+            foreach ($users as $user) {
+                $user->notify(new CreatingEventNotification($event));
+            }
+        });
 
         return redirect()->route('events.index')->with('success', 'Event created successfully.');
     }
@@ -123,6 +140,10 @@ class NextEventController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'event_code' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'categories' => 'required|array|min:1',
+            'categories.*.id' => 'nullable|integer|exists:categories,id',
+            'categories.*.name' => 'required|string|max:255',
+            'categories.*.capacity' => 'nullable|integer|min:1|max:1000',
         ]);
 
         if ($validator->fails()) {
@@ -143,10 +164,39 @@ class NextEventController extends Controller
             $data['image_url'] = asset('storage/' . $path);
         }
 
-        $event->update($data);
+        DB::transaction(function () use ($event, $data, $request) {
+            // Update the event data
+            $event->update($data);
+
+            $submittedCategoryIds = collect($request->categories)->pluck('id')->filter()->all();
+
+            // Delete categories that were removed in the form
+            $event->categories()->whereNotIn('id', $submittedCategoryIds)->delete();
+
+            // Add or update categories
+            foreach ($request->categories as $categoryData) {
+                if (!empty($categoryData['id'])) {
+                    // Update existing category
+                    $category = $event->categories()->find($categoryData['id']);
+                    if ($category) {
+                        $category->update([
+                            'name' => $categoryData['name'],
+                            'capacity' => $categoryData['capacity'] ?? 12,
+                        ]);
+                    }
+                } else {
+                    // Create new category
+                    $event->categories()->create([
+                        'name' => $categoryData['name'],
+                        'capacity' => $categoryData['capacity'] ?? 12,
+                    ]);
+                }
+            }
+        });
 
         return redirect()->route('events.index')->with('success', 'Event updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.

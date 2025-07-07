@@ -10,7 +10,7 @@ class Team extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'location', 'coach_id', 'points'];
+    protected $fillable = ['name', 'location', 'coach_id', 'points','email', 'phone'];
 
     public function coach()
     {
@@ -24,6 +24,24 @@ class Team extends Model
 
     public function events()
     {
-        return $this->belongsToMany(NextEvent::class, 'event_team', 'team_id', 'event_id');
+        return $this->belongsToMany(NextEvent::class, 'event_team', 'team_id', 'event_id')
+            ->withPivot('category_id')
+            ->withTimestamps();
+    }
+
+    public function categoryInEvent($eventId)
+    {
+        return $this->events()
+            ->where('event_id', $eventId)
+            ->first()
+            ->pivot
+            ->category_id ?? null;
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'event_team', 'team_id', 'category_id')
+            ->withPivot('event_id')
+            ->withTimestamps();
     }
 }

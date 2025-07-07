@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TeamController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CustomPlayerController;
 use App\Http\Controllers\Api\MatchupController;
 use App\Http\Controllers\Api\LeaderboardController;
@@ -166,3 +167,13 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['message' => 'All notifications deleted']);
     });
 });
+
+
+
+Route::post('/teams/{team}/categories/{category}/assign', [TeamController::class, 'assignToCategory'])->middleware('auth:sanctum');
+Route::get('/events/{event}/categories', [CategoryController::class, 'index']);
+
+
+
+Route::get('/events/{event}/teams-by-category', [CategoryController::class, 'teamsByCategory']);
+Route::get('/teams/{team}/players', [TeamController::class, 'players']);
