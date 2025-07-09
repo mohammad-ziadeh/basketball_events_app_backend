@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('team_id')->constrained()->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null');
+            $table->enum('status', ['pending', 'approved', 'denied'])->default('pending');
             $table->foreignId('event_id')->constrained('next_events')->onDelete('cascade');
             $table->unique(['team_id', 'event_id']);
             $table->timestamps();

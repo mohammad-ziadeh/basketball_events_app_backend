@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\NextEventController;
+use App\Http\Controllers\admin\AcceptCategoryTeamController;
 use App\Http\Controllers\admin\MatchupController;
 use App\Http\Controllers\admin\RefereeController;
 use App\Http\Controllers\ProfileController;
@@ -64,6 +65,9 @@ Route::delete('/matchups/{matchup}', [MatchupController::class, 'destroy'])->nam
 
 
 
+
+Route::get('/event/{eventId}/category-teams', [AcceptCategoryTeamController::class, 'index'])->name('categoryTeams');
+Route::patch('/event/category-teams/{teamId}/{categoryId}', [AcceptCategoryTeamController::class, 'updateStatus'])->name('updateTeamStatus');
 
 
 

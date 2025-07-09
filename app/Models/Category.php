@@ -19,7 +19,7 @@ class Category extends Model
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'event_team', 'category_id', 'team_id')
-            ->withPivot('event_id')
+            ->withPivot('event_id', 'status')
             ->withTimestamps();
     }
 

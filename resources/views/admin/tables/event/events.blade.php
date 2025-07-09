@@ -83,8 +83,11 @@
                             </p>
 
                             <!-- Actions -->
-                            <div class="d-flex justify-content-between mt-3">
+                            <div class="d-flex justify-content-between mt-3 flex-wrap gap-2">
                                 @if (!$event->trashed())
+                                    <a href="{{ route('categoryTeams', $event->id) }}" class="btn btn-sm btn-warning">
+                                        Check Team
+                                    </a>
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
                                         data-target="#editEventModal{{ $event->id }}">
                                         Edit
@@ -115,7 +118,7 @@
                 @endforelse
             </div>
 
-            @include('components.pagination', [ 'pag' => $events,])
+            @include('components.pagination', ['pag' => $events])
         </div>
     </div>
 

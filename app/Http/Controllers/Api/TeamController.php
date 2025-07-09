@@ -137,5 +137,26 @@ class TeamController extends Controller
         return response()->json($team);
     }
 
-    
+    // public function getTeams($eventId)
+    // {
+    //     $teams = Team::whereHas('events', function ($query) use ($eventId) {
+    //         $query->where('event_id', $eventId);
+    //     })->with([
+    //         'categories' => function ($query) use ($eventId) {
+    //             $query->where('event_id', $eventId);
+    //         }
+    //     ])->get();
+
+    //     // Flatten and assign a single category per team based on event
+    //     $teams = $teams->map(function ($team) use ($eventId) {
+    //         $category = $team->categories->firstWhere('pivot.event_id', $eventId);
+
+    //         $team->setRelation('category', $category); // Attach category directly
+    //         $team->unsetRelation('categories'); // Clean up unnecessary relation
+
+    //         return $team;
+    //     });
+
+    //     return response()->json($teams);
+    // }
 }
