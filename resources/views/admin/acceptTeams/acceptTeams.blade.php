@@ -53,6 +53,7 @@
             </div>
         @endforeach
     </div>
+    @include('components.pagination', [ 'pag' => $categories,])
 
     <!-- Edit Status Modal -->
     <div class="modal fade" id="editStatusModal" tabindex="-1" aria-labelledby="editStatusModalLabel"

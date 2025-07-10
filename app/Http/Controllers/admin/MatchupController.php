@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Matchup;
 use App\Models\NextEvent;
+use App\Models\Category;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -14,10 +15,13 @@ class MatchupController extends Controller
     public function index(Request $request)
     {
         $query = NextEvent::with([
+            'categories.teams',
             'teams',
-            'matchups.teamA',
-            'matchups.teamB',
+            'matchups' => function ($query) {
+                $query->with(['teamA', 'teamB', 'category']);
+            },
         ]);
+
 
         if ($request->filled('title')) {
             $query->where('title', 'like', '%' . $request->title . '%');
@@ -33,7 +37,6 @@ class MatchupController extends Controller
 
         if ($request->filled('filter')) {
             $now = now();
-
             if ($request->filter === 'upcoming') {
                 $query->where('start_date', '>', $now);
             } elseif ($request->filter === 'past') {
@@ -43,16 +46,30 @@ class MatchupController extends Controller
                     ->where('end_date', '>=', $now);
             }
         }
-        $now = now();
+
+
         $events = $query->orderBy('created_at', 'desc')->paginate(5);
 
-        return view('admin.tables.matchups.matchup', compact('events'));
+        foreach ($events as $event) {
+            $matchupsByCategory = $event->matchups->groupBy('category_id');
+
+            foreach ($event->categories as $category) {
+                $category->matchups = $matchupsByCategory->get($category->id, collect());
+            }
+        }
+
+        $availableRounds = Matchup::select('round')->distinct()->whereNotNull('round')->pluck('round');
+
+        return view('admin.tables.matchups.matchup', compact('events', 'availableRounds'));
     }
+
+
 
     public function store(Request $request)
     {
         $request->validate([
             'event_id' => 'required|exists:next_events,id',
+            'category_id' => 'required|exists:categories,id',
             'team_a_id' => 'required|exists:teams,id|different:team_b_id',
             'team_b_id' => 'required|exists:teams,id',
             'match_time' => 'nullable|date',
@@ -85,5 +102,21 @@ class MatchupController extends Controller
         $matchup->delete();
 
         return back()->with('success', 'Matchup deleted.');
+    }
+
+
+    public function getTeamsByCategory(Request $request, $categoryId)
+    {
+        $eventId = $request->query('event_id');
+
+        if (!$eventId) {
+            return response()->json(['error' => 'Event ID is required'], 400);
+        }
+
+        $category = Category::findOrFail($categoryId);
+
+        $teams = $category->teams()->wherePivot('event_id', $eventId)->get();
+
+        return response()->json($teams);
     }
 }

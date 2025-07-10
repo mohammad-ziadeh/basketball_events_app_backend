@@ -10,6 +10,7 @@ class Matchup extends Model
     protected $fillable = [
         'event_id',
         'team_a_id',
+        'category_id',
         'team_b_id',
         'match_time',
         'location',
@@ -22,7 +23,7 @@ class Matchup extends Model
     protected $casts = [
         'match_time' => 'datetime',
         'start_time' => 'datetime',
-        'duration' => 'time', 
+        'duration' => 'time',
     ];
 
     public function teamA()
@@ -55,5 +56,10 @@ class Matchup extends Model
     public function winner()
     {
         return $this->belongsTo(Team::class, 'winner_team_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

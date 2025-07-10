@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('matchups', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained('next_events')->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null');
             $table->foreignId('team_a_id')->constrained('teams')->onDelete('cascade');
             $table->foreignId('team_b_id')->constrained('teams')->onDelete('cascade');
             $table->unsignedTinyInteger('team_a_score')->nullable();

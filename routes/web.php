@@ -63,7 +63,7 @@ Route::put('/matchups/{matchup}', [MatchupController::class, 'update'])->name('m
 Route::delete('/matchups/{matchup}', [MatchupController::class, 'destroy'])->name('matchups.destroy');
 
 
-
+Route::get('/admin/category-teams/{category}', [MatchupController::class, 'getTeamsByCategory']);
 
 
 Route::get('/event/{eventId}/category-teams', [AcceptCategoryTeamController::class, 'index'])->name('categoryTeams');

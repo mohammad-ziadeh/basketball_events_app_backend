@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\DB;
 
 class AcceptCategoryTeamController extends Controller
 {
-    // Show all teams under each category for a specific event
     public function index($eventId)
     {
-        $categories = Category::with(['teams' => function ($query) use ($eventId) {
+        $cats = Category::with(['teams' => function ($query) use ($eventId) {
             $query->wherePivot('event_id', $eventId);
-        }])->where('event_id', $eventId)->get();
+        }])->where('event_id', $eventId);
+
+        $categories = $cats->paginate(10);
 
         return view('admin.acceptTeams.acceptTeams', compact('categories', 'eventId'));
     }
 
-    // Update team status in a category (approve/deny)
     public function updateStatus(Request $request, $teamId, $categoryId)
     {
         $request->validate([
