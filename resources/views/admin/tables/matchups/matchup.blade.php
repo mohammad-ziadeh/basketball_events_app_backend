@@ -120,8 +120,8 @@
                                                     </td>
                                                     <td>{{ optional($matchup->match_time)->format('Y-m-d H:i') ?? '—' }}
                                                     </td>
-                                                    <td><span
-                                                            class="badge bg-secondary">{{ $matchup->round ?? '—' }}</span>
+                                                    <td style="background-color: lightblue">
+                                                        {{ $matchup->round ?? '—' }}
                                                     </td>
                                                     <td>
                                                         <a href="{{ route('referee.control', $matchup->id) }}"
