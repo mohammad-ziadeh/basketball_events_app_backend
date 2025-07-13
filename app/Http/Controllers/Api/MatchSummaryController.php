@@ -14,7 +14,8 @@ class MatchSummaryController extends Controller
             'teamB',
             'winner',
             'stats.player.user',
-            'activePlayers'
+            'activePlayers',
+            'category'
         ])->findOrFail($matchupId);
 
         $stats = $matchup->stats;
@@ -38,9 +39,21 @@ class MatchSummaryController extends Controller
 
         return response()->json([
             'match_time' => optional($matchup->match_time)->toIso8601String(),
+            'location' => $matchup->location,
+            'round' => $matchup->round,
+            'category' => [
+                'id' => $matchup->category?->id,
+                'name' => $matchup->category?->name,
+            ],
+
             'team_a_name' => $matchup->teamA->name,
             'team_b_name' => $matchup->teamB->name,
             'winner_team' => $matchup->winner?->name,
+
+            'final_score' => [
+                'team_a' => $matchup->team_a_score ?? $teamPoints['A'],
+                'team_b' => $matchup->team_b_score ?? $teamPoints['B'],
+            ],
 
             'top_score_player' => $topScorer ? [
                 'player_id' => $topScorer->player->id,
@@ -92,7 +105,4 @@ class MatchSummaryController extends Controller
             })->values(),
         ]);
     }
-
-
-
 }

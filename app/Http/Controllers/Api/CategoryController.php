@@ -14,7 +14,6 @@ class CategoryController extends Controller
 
     public function index(NextEvent $event)
     {
-        // Eager load categories for the event
         $categories = $event->categories()->get();
 
         return response()->json($categories);
@@ -30,5 +29,21 @@ class CategoryController extends Controller
         }
 
         return response()->json($teams);
+    }
+
+    public function teamsByCategoryWithNames($eventId)
+    {
+        $categories = Category::where('event_id', $eventId)->with('teams')->get();
+
+        $result = [];
+
+        foreach ($categories as $category) {
+            $result[$category->id] = [
+                'category_name' => $category->name,
+                'teams' => $category->teams,
+            ];
+        }
+
+        return response()->json($result);
     }
 }

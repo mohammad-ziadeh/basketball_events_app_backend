@@ -176,4 +176,5 @@ Route::get('/events/{event}/categories', [CategoryController::class, 'index']);
 
 
 Route::get('/events/{event}/teams-by-category', [CategoryController::class, 'teamsByCategory']);
+Route::get('/events/{eventId}/teams-by-category-with-names', [CategoryController::class, 'teamsByCategoryWithNames']);
 Route::get('/teams/{team}/players', [TeamController::class, 'players']);
