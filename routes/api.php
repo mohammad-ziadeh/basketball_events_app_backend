@@ -29,9 +29,9 @@ use App\Http\Controllers\Api\ProfileController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum', 'verified')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 
 
@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
@@ -80,7 +80,7 @@ Route::get('/matchups/{matchup}/summary', [MatchSummaryController::class, 'show'
 
 Route::get('/leaderboard/players', [LeaderboardController::class, 'playerLeaderboard']);
 Route::get('/leaderboard/teams', [LeaderboardController::class, 'teamLeaderboard']);
-
+Route::get('/leaderboard/teams/{teamId}/players', [LeaderboardController::class, 'teamPlayers']);
 
 Route::get('/next-events/search', [NextEventController::class, 'search']);
 Route::get('/next-events/suggestions', [NextEventController::class, 'suggestions']);
@@ -178,3 +178,12 @@ Route::get('/events/{event}/categories', [CategoryController::class, 'index']);
 Route::get('/events/{event}/teams-by-category', [CategoryController::class, 'teamsByCategory']);
 Route::get('/events/{eventId}/teams-by-category-with-names', [CategoryController::class, 'teamsByCategoryWithNames']);
 Route::get('/teams/{team}/players', [TeamController::class, 'players']);
+
+
+
+
+// verify email
+
+
+Route::middleware('auth:sanctum')->post('/send-verification-code', [AuthController::class, 'sendVerificationCode']);
+Route::middleware('auth:sanctum')->post('/verify-email-code', [AuthController::class, 'verifyEmailCode']);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Illuminate\Notifications\Notifiable
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, SoftDeletes, Notifiable;
 
@@ -35,8 +36,9 @@ class User extends Authenticatable
         'role',
         'email',
         'password',
+        'verification_code',
         'phone',
-        'avatar_url',       
+        'avatar_url',
         'background_url',
     ];
 

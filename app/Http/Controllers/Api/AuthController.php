@@ -7,13 +7,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerificationCodeMail;
 
 class AuthController extends Controller
 {
-
     public function register(Request $request)
     {
-
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
@@ -39,6 +39,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('flutter_token')->plainTextToken;
 
+        // Generate and email verification code
+        // $code = rand(100000, 999999);
+        // $user->verification_code = $code;
+        // $user->save();
+
+        // Mail::to($user->email)->send(new VerificationCodeMail($code));
+
         return response()->json([
             'user'  => $user,
             'token' => $token
@@ -58,6 +65,10 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email not verified.'], 403);
+        }
+
         $token = $user->createToken('flutter_token')->plainTextToken;
 
         return response()->json([
@@ -66,14 +77,10 @@ class AuthController extends Controller
         ]);
     }
 
-
-
     public function user(Request $request)
     {
         return response()->json($request->user());
     }
-
-
 
     public function logout(Request $request)
     {
@@ -84,5 +91,39 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logged out']);
+    }
+
+    public function sendVerificationCode(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Not authenticated'], 401);
+        }
+
+        $code = rand(100000, 999999);
+        $user->verification_code = $code;
+        $user->save();
+
+        Mail::to($user->email)->send(new VerificationCodeMail($code));
+
+        return response()->json(['message' => 'Verification code sent.']);
+    }
+
+    public function verifyEmailCode(Request $request)
+    {
+        $request->validate(['code' => 'required|digits:6']);
+
+        $user = $request->user();
+
+        if ($user->verification_code === $request->code) {
+            $user->email_verified_at = now();
+            $user->verification_code = null;
+            $user->save();
+
+            return response()->json(['message' => 'Email verified successfully.']);
+        }
+
+        return response()->json(['message' => 'Invalid verification code.'], 422);
     }
 }
