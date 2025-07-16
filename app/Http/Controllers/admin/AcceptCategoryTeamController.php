@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Team;
+use App\Notifications\TeamAcceptedNotification;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 
@@ -31,6 +32,16 @@ class AcceptCategoryTeamController extends Controller
             ->where('team_id', $teamId)
             ->where('category_id', $categoryId)
             ->update(['status' => $request->status]);
+
+
+        if ($request->status === 'approved') {
+            $team = Team::with('coach')->findOrFail($teamId);
+            $category = Category::findOrFail($categoryId);
+
+            if ($team->coach) {
+                $team->coach->notify(new TeamAcceptedNotification($team, $category));
+            }
+        }
 
         return redirect()->back()->with('success', 'Team status updated successfully.');
     }

@@ -97,12 +97,10 @@ class TeamController extends Controller
             ], 400);
         }
 
-        // Update email and phone in team
         $team->email = $request->email;
         $team->phone = $request->phone;
         $team->save();
 
-        // Assign team to category with event pivot data
         $team->categories()->syncWithoutDetaching([
             $category->id => ['event_id' => $category->event_id],
         ]);

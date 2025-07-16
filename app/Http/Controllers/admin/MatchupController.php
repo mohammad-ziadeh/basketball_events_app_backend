@@ -16,7 +16,7 @@ class MatchupController extends Controller
     {
         $query = NextEvent::with([
             'categories.teams',
-            'teams',
+            'teams', 
             'matchups' => function ($matchupQuery) use ($request) {
                 $matchupQuery->with(['teamA', 'teamB', 'category']);
 

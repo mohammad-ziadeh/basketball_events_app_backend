@@ -107,7 +107,6 @@ class NextEventController extends Controller
                 ]);
             }
 
-            // Notify users
             $users = User::all();
             foreach ($users as $user) {
                 $user->notify(new CreatingEventNotification($event));
@@ -165,18 +164,14 @@ class NextEventController extends Controller
         }
 
         DB::transaction(function () use ($event, $data, $request) {
-            // Update the event data
             $event->update($data);
 
             $submittedCategoryIds = collect($request->categories)->pluck('id')->filter()->all();
 
-            // Delete categories that were removed in the form
             $event->categories()->whereNotIn('id', $submittedCategoryIds)->delete();
 
-            // Add or update categories
             foreach ($request->categories as $categoryData) {
                 if (!empty($categoryData['id'])) {
-                    // Update existing category
                     $category = $event->categories()->find($categoryData['id']);
                     if ($category) {
                         $category->update([
@@ -185,7 +180,6 @@ class NextEventController extends Controller
                         ]);
                     }
                 } else {
-                    // Create new category
                     $event->categories()->create([
                         'name' => $categoryData['name'],
                         'capacity' => $categoryData['capacity'] ?? 12,
