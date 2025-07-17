@@ -30,4 +30,9 @@ class Category extends Model
 
         return $assignedTeamsCount < $this->capacity;
     }
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class);
+    }
 }

@@ -81,75 +81,97 @@
 
                             <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
                                 <h5 class="mb-0">{{ $category->name }}</h5>
-                                <button class="btn btn-sm btn-primary" data-toggle="modal"
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
                                     data-target="#createMatchupModal{{ $event->id }}_category_{{ $category->id }}">
                                     + Create Matchup
                                 </button>
                             </div>
 
-                            @if ($category->matchups->isEmpty())
+                            @if ($categoryMatchups->isEmpty())
                                 <p class="text-muted mb-4">No matchups in this category.</p>
                             @else
-                                <div class="table-responsive mb-4">
-                                    <table class="table table-bordered table-hover align-middle">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Team A</th>
-                                                <th class="text-center">VS</th>
-                                                <th>Team B</th>
-                                                <th>Match Time</th>
-                                                <th>Round</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($category->matchups as $matchup)
-                                                <tr>
-                                                    <td>
-                                                        <a href="{{ route('referee.control', $matchup->id) }}"
-                                                            class="text-decoration-none">
-                                                            {{ $matchup->teamA->name }}
-                                                        </a>
-                                                    </td>
-                                                    <td class="text-center fw-bold">VS</td>
-                                                    <td>
-                                                        <a href="{{ route('referee.control', $matchup->id) }}"
-                                                            class="text-decoration-none">
-                                                            {{ $matchup->teamB->name }}
-                                                        </a>
-                                                    </td>
-                                                    <td>{{ optional($matchup->match_time)->format('Y-m-d H:i') ?? '—' }}
-                                                    </td>
-                                                    <td style="background-color: lightblue">
-                                                        {{ $matchup->round ?? '—' }}
-                                                    </td>
-                                                    <td>
-                                                        <a href="{{ route('referee.control', $matchup->id) }}"
-                                                            class="btn btn-sm btn-success">Control</a>
+                                @php
+                                    $matchupsByGroup = $categoryMatchups->groupBy('group_id');
+                                @endphp
 
-                                                        <button class="btn btn-sm btn-warning" data-toggle="modal"
-                                                            data-target="#editMatchupModal{{ $matchup->id }}">Edit</button>
+                                @foreach ($matchupsByGroup as $groupId => $groupMatchups)
+                                    @php
+                                        $group = $category->groups->firstWhere('id', $groupId);
+                                    @endphp
 
-                                                        <form method="POST" id="delete-form-{{ $matchup->id }}"
-                                                            action="{{ route('matchups.destroy', $matchup->id) }}"
-                                                            class="d-inline">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="button"
-                                                                onclick="confirmDelete({{ $matchup->id }})"
-                                                                class="btn btn-sm btn-danger">Delete</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
+                                    <div class="mb-4 p-3 bg-light border rounded">
+                                        <h6 class="mb-3 text-primary">
+                                            {{ $group ? $group->name : 'Ungrouped' }}
+                                        </h6>
 
-                                                @include('admin.tables.matchups.matchup-edit-modal', [
-                                                    'matchup' => $matchup,
-                                                    'teams' => $event->teams,
-                                                ])
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Team A</th>
+                                                        <th class="text-center">VS</th>
+                                                        <th>Team B</th>
+                                                        <th>Match Time</th>
+                                                        <th>Round</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($groupMatchups as $matchup)
+                                                        <tr>
+                                                            <td>
+                                                                <a href="{{ route('referee.control', $matchup->id) }}"
+                                                                    class="text-decoration-none">
+                                                                    {{ $matchup->teamA->name }}
+                                                                </a>
+                                                            </td>
+                                                            <td class="text-center fw-bold">VS</td>
+                                                            <td>
+                                                                <a href="{{ route('referee.control', $matchup->id) }}"
+                                                                    class="text-decoration-none">
+                                                                    {{ $matchup->teamB->name }}
+                                                                </a>
+                                                            </td>
+                                                            <td>{{ optional($matchup->match_time)->format('Y-m-d H:i') ?? '—' }}
+                                                            </td>
+                                                            <td style="background-color: lightblue">
+                                                                {{ $matchup->round ?? '—' }}</td>
+                                                            <td>
+                                                                <a href="{{ route('referee.control', $matchup->id) }}"
+                                                                    class="btn btn-sm btn-success">Control</a>
+                                                                <button type="button" class="btn btn-sm btn-warning"
+                                                                    data-toggle="modal"
+                                                                    data-target="#editMatchupModal{{ $matchup->id }}">Edit</button>
+
+
+                                                                <form method="POST"
+                                                                    id="delete-form-{{ $matchup->id }}"
+                                                                    action="{{ route('matchups.destroy', $matchup->id) }}"
+                                                                    class="d-inline">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="button"
+                                                                        onclick="confirmDelete({{ $matchup->id }})"
+                                                                        class="btn btn-sm btn-danger">
+                                                                        Delete
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+
+                                                        @include(
+                                                            'admin.tables.matchups.matchup-edit-modal',
+                                                            [
+                                                                'matchup' => $matchup,
+                                                                'teams' => $event->teams,
+                                                            ]
+                                                        )
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endforeach
                             @endif
 
                             @include('admin.tables.matchups.matchup-create-modal', [
@@ -163,17 +185,49 @@
                 </div>
             </div>
         @endforeach
+        <div class="card shadow-sm mt-5">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Manage Groups</h5>
+                <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#createGroupModal">+ Add
+                    Group</button>
+            </div>
+            <div class="card-body">
+                @foreach ($events as $event)
+                    @foreach ($event->categories as $category)
+                        <h6 class="text-primary">{{ $category->name }}</h6>
+                        @foreach ($category->groups as $group)
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                <div>
+                                    <strong>{{ $group->name }}</strong>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-warning" data-toggle="modal"
+                                        data-target="#editGroupModal{{ $group->id }}">Edit</button>
+
+                                    <form method="POST" id="delete-group-form-{{ $group->id }}"
+                                        action="{{ route('groups.destroy', $group->id) }}" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" onclick="confirmGroupDelete({{ $group->id }})"
+                                            class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            @include('admin.tables.groups.groups-edit-modal', [
+                                'group' => $group,
+                                'categories' => $categories,
+                            ])
+                        @endforeach
+                    @endforeach
+                @endforeach
+            </div>
+        </div>
+        @include('admin.tables.groups.groups-create-modal')
 
         @include('components.pagination', ['pag' => $events])
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         function confirmDelete(id) {
@@ -187,6 +241,21 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.querySelector('#delete-form-' + id).submit();
+                }
+            });
+        }
+
+        function confirmGroupDelete(id) {
+            Swal.fire({
+                title: "Are you sure?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.querySelector('#delete-group-form-' + id).submit();
                 }
             });
         }

@@ -16,14 +16,11 @@ class MatchupController extends Controller
     {
         $query = NextEvent::with([
             'categories.teams',
-            'teams', 
-            'matchups' => function ($matchupQuery) use ($request) {
-                $matchupQuery->with(['teamA', 'teamB', 'category']);
-
-                if ($request->filled('round')) {
-                    $matchupQuery->where('round', $request->round);
-                }
-            },
+            'categories.groups.matchups.teamA',
+            'categories.groups.matchups.teamB',
+            'teams',
+            'categories.groups',
+            'matchups.category',
         ]);
 
 
@@ -55,16 +52,28 @@ class MatchupController extends Controller
         $events = $query->orderBy('created_at', 'desc')->paginate(5);
 
         foreach ($events as $event) {
-            $matchupsByCategory = $event->matchups->groupBy('category_id');
-
             foreach ($event->categories as $category) {
-                $category->matchups = $matchupsByCategory->get($category->id, collect());
+                // Filter matchups for this category
+                $categoryMatchups = $event->matchups->where('category_id', $category->id);
+
+                // Group these category-specific matchups by group_id or 'ungrouped'
+                $matchupsGrouped = $categoryMatchups->groupBy(function ($matchup) {
+                    return $matchup->group_id ?? 'ungrouped';
+                });
+
+                // Assign matchups to each group in this category
+                $category->groups->each(function ($group) use ($matchupsGrouped) {
+                    $group->matchups = $matchupsGrouped->get($group->id, collect());
+                });
+
+                // Assign ungrouped matchups for this category
+                $category->ungroupedMatchups = $matchupsGrouped->get('ungrouped', collect());
             }
         }
-
+        $categories = Category::all();
         $availableRounds = Matchup::select('round')->distinct()->whereNotNull('round')->pluck('round');
 
-        return view('admin.tables.matchups.matchup', compact('events', 'availableRounds'));
+        return view('admin.tables.matchups.matchup', compact('events', 'availableRounds', 'categories'));
     }
 
 
@@ -79,9 +88,11 @@ class MatchupController extends Controller
             'match_time' => 'nullable|date',
             'location' => 'nullable|string',
             'round' => 'nullable|string',
+            'group_id' => 'nullable|exists:groups,id',
         ]);
 
         Matchup::create($request->all());
+        
 
         return back()->with('success', 'Matchup created successfully.');
     }
@@ -94,12 +105,14 @@ class MatchupController extends Controller
             'match_time' => 'nullable|date',
             'location' => 'nullable|string',
             'round' => 'nullable|string',
+            'group_id' => 'nullable|exists:groups,id',
         ]);
 
         $matchup->update($request->all());
 
         return back()->with('success', 'Matchup updated successfully.');
     }
+    
 
     public function destroy(Matchup $matchup)
     {

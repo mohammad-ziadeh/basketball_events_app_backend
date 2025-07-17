@@ -13,6 +13,7 @@ class Matchup extends Model
         'category_id',
         'team_b_id',
         'match_time',
+        'group_id',
         'location',
         'round',
         'start_time',
@@ -61,5 +62,11 @@ class Matchup extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
     }
 }

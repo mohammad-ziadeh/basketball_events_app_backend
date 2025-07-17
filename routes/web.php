@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\NextEventController;
 use App\Http\Controllers\admin\AcceptCategoryTeamController;
 use App\Http\Controllers\admin\MatchupController;
+use App\Http\Controllers\admin\GroupController;
 use App\Http\Controllers\admin\RefereeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Response;
@@ -52,6 +53,8 @@ require __DIR__ . '/auth.php';
 
 
 
+Route::resource('groups', GroupController::class)->except(['show']);
+Route::get('/admin/matchups/{id}/data', [MatchupController::class, 'getMatchupData']);
 
 
 Route::get('/matchups', [MatchupController::class, 'index'])->name('matchups.index');

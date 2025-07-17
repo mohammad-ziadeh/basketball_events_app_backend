@@ -6,9 +6,9 @@
                 <h5 class="modal-title" id="{{ $modalId }}Label">
                     Create Matchup for {{ $event->title }} - {{ $category->name }}
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+  <span aria-hidden="true">&times;</span>
+</button>
             </div>
 
             <form method="POST" action="{{ route('matchups.store') }}">
@@ -59,6 +59,18 @@
                             <input type="text" name="round" id="round_{{ $modalId }}" class="form-control"
                                 placeholder="e.g., Semi Final">
                         </div>
+
+                        @if ($category->groups->isNotEmpty())
+                            <div class="col-md-12">
+                                <label for="group_{{ $modalId }}" class="form-label">Group (optional)</label>
+                                <select name="group_id" id="group_{{ $modalId }}" class="form-control select2">
+                                    <option value="">No Group</option>
+                                    @foreach ($category->groups as $group)
+                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -73,7 +85,7 @@
 
 <script>
     $(document).ready(function() {
-        $('#team_a_{{ $modalId }}, #team_b_{{ $modalId }}').select2({
+        $('#team_a_{{ $modalId }}, #team_b_{{ $modalId }}, #group_{{ $modalId }}').select2({
             dropdownParent: $('#{{ $modalId }}')
         });
     });
