@@ -58,6 +58,7 @@ class MatchSummaryController extends Controller
             'top_score_player' => $topScorer ? [
                 'player_id' => $topScorer->player->id,
                 'player_name' => $topScorer->player->user->name,
+                'user_id' => $topScorer->player->user->id,
                 'points' => $topScorer->points,
                 'assists' => $topScorer->assists,
                 'fouls' => $topScorer->fouls,
@@ -67,6 +68,7 @@ class MatchSummaryController extends Controller
                 'player_id' => $topAssist->player->id,
                 'player_name' => $topAssist->player->user->name,
                 'points' => $topAssist->points,
+                'user_id' => $topAssist->player->user->id,
                 'assists' => $topAssist->assists,
                 'fouls' => $topAssist->fouls,
             ] : null,
@@ -100,6 +102,7 @@ class MatchSummaryController extends Controller
                     'player_name' => $stat->player->user->name,
                     'points' => $stat->points,
                     'assists' => $stat->assists,
+                    'user_id' => $stat->player->user->id,
                     'fouls' => $stat->fouls,
                 ];
             })->values(),

@@ -188,41 +188,65 @@
         <div class="card shadow-sm mt-5">
             <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Manage Groups</h5>
-                <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#createGroupModal">+ Add
-                    Group</button>
+                <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#createGroupModal">
+                    <i class="bi bi-plus-circle"></i> Add Group
+                </button>
             </div>
             <div class="card-body">
                 @foreach ($events as $event)
                     @foreach ($event->categories as $category)
-                        <h6 class="text-primary">{{ $category->name }}</h6>
-                        @foreach ($category->groups as $group)
-                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                                <div>
-                                    <strong>{{ $group->name }}</strong>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-warning" data-toggle="modal"
-                                        data-target="#editGroupModal{{ $group->id }}">Edit</button>
-
-                                    <form method="POST" id="delete-group-form-{{ $group->id }}"
-                                        action="{{ route('groups.destroy', $group->id) }}" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" onclick="confirmGroupDelete({{ $group->id }})"
-                                            class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
-                                </div>
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3 d-flex justify-content-between align-items-center"
+                                style="cursor:pointer" data-toggle="collapse"
+                                href="#categoryGroups{{ $category->id }}" role="button" aria-expanded="false"
+                                aria-controls="categoryGroups{{ $category->id }}">
+                                {{ $category->name }}
+                                <i class="bi bi-chevron-down"></i>
+                            </h6>
+                            <div class="collapse" id="categoryGroups{{ $category->id }}">
+                                @if ($category->groups->isEmpty())
+                                    <p class="text-muted">No groups added yet.</p>
+                                @else
+                                    <ul class="list-group">
+                                        @foreach ($category->groups as $group)
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><strong>{{ $group->name }}</strong></span>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-warning me-2"
+                                                        data-toggle="modal"
+                                                        data-target="#editGroupModal{{ $group->id }}"
+                                                        aria-label="Edit Group {{ $group->name }}">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <form method="POST" id="delete-group-form-{{ $group->id }}"
+                                                        action="{{ route('groups.destroy', $group->id) }}"
+                                                        class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button"
+                                                            onclick="confirmGroupDelete({{ $group->id }})"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            aria-label="Delete Group {{ $group->name }}">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </li>
+                                            @include('admin.tables.groups.groups-edit-modal', [
+                                                'group' => $group,
+                                                'categories' => $categories,
+                                            ])
+                                        @endforeach
+                                    </ul>
+                                @endif
                             </div>
-
-                            @include('admin.tables.groups.groups-edit-modal', [
-                                'group' => $group,
-                                'categories' => $categories,
-                            ])
-                        @endforeach
+                        </div>
                     @endforeach
                 @endforeach
             </div>
         </div>
+
         @include('admin.tables.groups.groups-create-modal')
 
         @include('components.pagination', ['pag' => $events])

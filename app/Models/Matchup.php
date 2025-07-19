@@ -24,7 +24,7 @@ class Matchup extends Model
     protected $casts = [
         'match_time' => 'datetime',
         'start_time' => 'datetime',
-        'duration' => 'time',
+        'duration' => 'string',
     ];
 
     public function teamA()

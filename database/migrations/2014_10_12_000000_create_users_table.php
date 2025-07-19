@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female'])->default('male');
             $table->date('birth_date')->nullable();
             $table->integer('points')->default(0);
-            $table->string('avatar_url')->nullable()->default('http://192.168.1.159:8000/storage/profile_images/md9cZcqBcAryyOPmpIhPpjQM1OgookRnXgFlsRbj.jpg');
+            $table->string('avatar_url')->nullable();
             $table->string('background_url')->nullable();
             $table->string('name')->nullable();
             $table->integer('phone')->nullable();
