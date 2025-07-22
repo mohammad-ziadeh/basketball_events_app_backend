@@ -17,27 +17,50 @@ class ProfileController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $user->load([
-            'player.team',
-            'player.events' => function ($query) {
-                $query->withPivot('points');
-            }
-        ]);
+        $user->load('player.team.events.categories.groups.matchups.stats');
 
         $player = $user->player;
 
         $events = [];
 
-        if ($player) {
-            $events = $player->events->map(function ($event) use ($player) {
+        if ($player && $player->team) {
+            $teamId = $player->team->id;
+
+            $events = $player->team->events->map(function ($event) use ($player, $teamId) {
+                $category = $player->team->getCategoryForEvent($event->id);
+
+                $matchups = $event->categories
+                    ->flatMap(fn($cat) => $cat->groups)
+                    ->flatMap(fn($group) => $group->matchups);
+
+                $teamMatchups = $matchups->filter(
+                    fn($matchup) =>
+                    $matchup->team_a_id === $teamId || $matchup->team_b_id === $teamId
+                );
+
+                $points = $teamMatchups->reduce(function ($carry, $matchup) use ($teamId) {
+                    if ($matchup->team_a_id === $teamId) {
+                        return $carry + ($matchup->team_a_score ?? 0);
+                    } elseif ($matchup->team_b_id === $teamId) {
+                        return $carry + ($matchup->team_b_score ?? 0);
+                    }
+                    return $carry;
+                }, 0);
+
+
                 return [
                     'event_name' => $event->title,
-                    'points' => $event->pivot->points ?? 0,
-                    'team_name' => $player->team?->name ?? null,
+                    'event_id' => $event->id,
+                    'points' => $points,
+                    'team_name' => $player->team->name,
+                    'category_name' => $category?->name,
+                    'start_date' => $event->start_date->format('M d, Y'),
                     'date_range' => $event->start_date->format('M d, Y') . ' - ' . $event->end_date->format('M d, Y'),
+
                 ];
             });
         }
+
 
         $allPlayers = User::where('role', 'player')
             ->orderByDesc('points')
@@ -98,14 +121,10 @@ class ProfileController extends Controller
     }
 
 
-
     public function showPlayerProfile($id)
     {
         $user = User::with([
-            'player.team',
-            'player.events' => function ($query) {
-                $query->withPivot('points');
-            }
+            'player.team.events.categories.groups.matchups.stats'
         ])->find($id);
 
         if (!$user) {
@@ -113,15 +132,39 @@ class ProfileController extends Controller
         }
 
         $player = $user->player;
-
         $events = [];
 
-        if ($player) {
-            $events = $player->events->map(function ($event) use ($player) {
+        if ($player && $player->team) {
+            $teamId = $player->team->id;
+
+            $events = $player->team->events->map(function ($event) use ($player, $teamId) {
+                $category = $player->team->getCategoryForEvent($event->id);
+
+                $matchups = $event->categories
+                    ->flatMap(fn($cat) => $cat->groups)
+                    ->flatMap(fn($group) => $group->matchups);
+
+                $teamMatchups = $matchups->filter(
+                    fn($matchup) =>
+                    $matchup->team_a_id === $teamId || $matchup->team_b_id === $teamId
+                );
+
+                $points = $teamMatchups->reduce(function ($carry, $matchup) use ($teamId) {
+                    if ($matchup->team_a_id === $teamId) {
+                        return $carry + ($matchup->team_a_score ?? 0);
+                    } elseif ($matchup->team_b_id === $teamId) {
+                        return $carry + ($matchup->team_b_score ?? 0);
+                    }
+                    return $carry;
+                }, 0);
+
                 return [
                     'event_name' => $event->title,
-                    'points' => $event->pivot->points ?? 0,
-                    'team_name' => $player->team?->name ?? null,
+                    'event_id' => $event->id,
+                    'points' => $points,
+                    'team_name' => $player->team->name,
+                    'category_name' => $category?->name,
+                    'start_date' => $event->start_date->format('M d, Y'),
                     'date_range' => $event->start_date->format('M d, Y') . ' - ' . $event->end_date->format('M d, Y'),
                 ];
             });

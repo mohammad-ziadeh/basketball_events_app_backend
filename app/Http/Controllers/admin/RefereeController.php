@@ -80,12 +80,27 @@ class RefereeController extends Controller
         );
 
         $diff = $newPoints - $previousPoints;
-
         $player->user->increment('points', $diff);
         $player->team->increment('points', $diff);
 
+        $matchup = Matchup::with(['stats.player'])->findOrFail($data['matchup_id']);
+
+        $teamAPoints = $matchup->stats->filter(function ($stat) use ($matchup) {
+            return $stat->player && $stat->player->team_id === $matchup->team_a_id;
+        })->sum('points');
+
+        $teamBPoints = $matchup->stats->filter(function ($stat) use ($matchup) {
+            return $stat->player && $stat->player->team_id === $matchup->team_b_id;
+        })->sum('points');
+
+        $matchup->update([
+            'team_a_score' => $teamAPoints,
+            'team_b_score' => $teamBPoints,
+        ]);
+
         return back()->with('success', 'Match stats and totals updated successfully');
     }
+
 
     public function startMatchTimer(Matchup $matchup)
     {

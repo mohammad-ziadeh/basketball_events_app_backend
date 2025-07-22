@@ -10,6 +10,8 @@ class Matchup extends Model
     protected $fillable = [
         'event_id',
         'team_a_id',
+        'team_b_score',
+        'team_a_score',
         'category_id',
         'team_b_id',
         'match_time',

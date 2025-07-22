@@ -104,7 +104,8 @@
                             <h6 class="text-primary" style="font-size: 1.25rem; text-align: center;">
                                 {{ $team->name }}</h6>
                             <h6 class="text-primary" style="font-size: 1.25rem; text-align: center;">
-                                {{ $team->points }}</h6>
+                                {{ $side === 'A' ? $matchup->team_a_score : $matchup->team_b_score }}
+                            </h6>
                             @foreach ($matchup->activePlayers->where('team_side', $side) as $assignment)
                                 @php
                                     $player = $assignment->player;
@@ -129,11 +130,13 @@
                                             <label class="form-label">Pts</label>
                                             <input type="number" name="points"
                                                 class="form-control form-control-lg points-input"
-                                                value="{{ $stat->points ?? 0 }}" min="0" >
+                                                value="{{ $stat->points ?? 0 }}" min="0">
                                             <div class="mt-1 d-flex gap-2">
-                                                <button type="button" class="btn btn-sm btn-outline-success custom-size-btn add-points"
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-success custom-size-btn add-points"
                                                     data-value="1">+1</button>
-                                                <button type="button" class="btn btn-sm btn-outline-success custom-size-btn add-points"
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-success custom-size-btn add-points"
                                                     data-value="2">+2</button>
                                             </div>
                                         </div>
@@ -141,7 +144,7 @@
                                             <label class="form-label">AST</label>
                                             <input type="number" name="assists"
                                                 class="form-control form-control-lg assists-input"
-                                                value="{{ $stat->assists ?? 0 }}" min="0" >
+                                                value="{{ $stat->assists ?? 0 }}" min="0">
                                             <div class="mt-1" style="display: flex; justify-content: center;">
                                                 <button type="button"
                                                     class="btn btn-sm btn-outline-primary custom-size-btn add-assist">+1</button>
@@ -151,7 +154,7 @@
                                             <label class="form-label">Fouls</label>
                                             <input type="number" name="fouls"
                                                 class="form-control form-control-lg fouls-input"
-                                                value="{{ $stat->fouls ?? 0 }}" min="0" >
+                                                value="{{ $stat->fouls ?? 0 }}" min="0">
                                             <div class="mt-1" style="display: flex; justify-content: center;">
                                                 <button type="button"
                                                     class="btn btn-sm btn-outline-danger custom-size-btn add-foul">+1</button>
@@ -283,11 +286,14 @@
             });
         });
     </script>
-<style>
-    .custom-size-btn {
-    min-width: 80px;   /* make button longer */
-    padding: 0.5rem 1.2rem;  /* increase height and horizontal padding */
-    font-size: 1rem;   /* keep font normal size */
-}
-</style>
+    <style>
+        .custom-size-btn {
+            min-width: 80px;
+            /* make button longer */
+            padding: 0.5rem 1.2rem;
+            /* increase height and horizontal padding */
+            font-size: 1rem;
+            /* keep font normal size */
+        }
+    </style>
 </x-app-layout>
