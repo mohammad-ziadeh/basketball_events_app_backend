@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\NextEventController;
 use App\Http\Controllers\admin\AcceptCategoryTeamController;
 use App\Http\Controllers\admin\MatchupController;
 use App\Http\Controllers\admin\GroupController;
+use App\Http\Controllers\admin\CarouselController;
 use App\Http\Controllers\admin\RefereeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Response;
@@ -35,7 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
+Route::resource('carousels', CarouselController::class);
 
 Route::resource('users', UserController::class);
 

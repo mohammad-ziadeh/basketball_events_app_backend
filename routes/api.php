@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\MatchupController;
 use App\Http\Controllers\Api\LeaderboardController;
 use App\Http\Controllers\Api\MatchSummaryController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CarouselController;
 use App\Http\Controllers\Api\PlayerController;
 use App\Http\Controllers\Api\NextEventController;
 use App\Http\Resources\NotificationResource;
@@ -44,6 +45,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+Route::get('/carousel', [CarouselController::class, 'index']);
 
 Route::get('/events', [NextEventController::class, 'index']);
 Route::get('/events/{id}', [NextEventController::class, 'show']);

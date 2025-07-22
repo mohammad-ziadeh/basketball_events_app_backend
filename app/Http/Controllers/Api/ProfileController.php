@@ -94,10 +94,10 @@ class ProfileController extends Controller
 
         return [
             ['title' => 'Rookie', 'unlocked' => $points >= 0],
-            ['title' => 'Pro Player', 'unlocked' => $points >= 35],
-            ['title' => 'All-Star', 'unlocked' => $points >= 70],
-            ['title' => 'Elite', 'unlocked' => $points >= 100],
-            ['title' => 'Legend', 'unlocked' => $points >= 150],
+            ['title' => 'Pro Player', 'unlocked' => $points >= 75],
+            ['title' => 'All-Star', 'unlocked' => $points >= 120],
+            ['title' => 'Elite', 'unlocked' => $points >= 200],
+            ['title' => 'Legend', 'unlocked' => $points >= 350],
         ];
     }
 

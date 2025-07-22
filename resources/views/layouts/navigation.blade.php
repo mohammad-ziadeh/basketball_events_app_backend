@@ -25,6 +25,9 @@
                     <x-nav-link :href="route('matchups.index')" :active="request()->routeIs('matchups.index')" style="color: #eeeeee; text-decoration: none;">
                         {{ __('Matchup') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('carousels.index')" :active="request()->routeIs('carousels.index')" style="color: #eeeeee; text-decoration: none;">
+                        {{ __('Carousels') }}
+                    </x-nav-link>
                 </div>
             </div>
 
