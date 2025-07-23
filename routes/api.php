@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\MatchSummaryController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CarouselController;
 use App\Http\Controllers\Api\PlayerController;
+use App\Http\Controllers\Api\SocialStatsController;
 use App\Http\Controllers\Api\NextEventController;
 use App\Http\Resources\NotificationResource;
 use App\Http\Controllers\Api\ProfileController;
@@ -189,3 +190,9 @@ Route::get('/teams/{team}/players', [TeamController::class, 'players']);
 
 Route::middleware('auth:sanctum')->post('/send-verification-code', [AuthController::class, 'sendVerificationCode']);
 Route::middleware('auth:sanctum')->post('/verify-email-code', [AuthController::class, 'verifyEmailCode']);
+
+
+
+// socials 
+
+Route::get('/social-stats', [SocialStatsController::class, 'getStats']);
