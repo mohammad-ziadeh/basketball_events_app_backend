@@ -28,6 +28,9 @@
                     <x-nav-link :href="route('carousels.index')" :active="request()->routeIs('carousels.index')" style="color: #eeeeee; text-decoration: none;">
                         {{ __('Carousels') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('gallery.index')" :active="request()->routeIs('gallery.index')" style="color: #eeeeee; text-decoration: none;">
+                        {{ __('Gallery') }}
+                    </x-nav-link>
                 </div>
             </div>
 

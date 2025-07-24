@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\NextEventController;
 use App\Http\Controllers\admin\AcceptCategoryTeamController;
 use App\Http\Controllers\admin\MatchupController;
 use App\Http\Controllers\admin\GroupController;
+use App\Http\Controllers\admin\GalleryController;
 use App\Http\Controllers\admin\CarouselController;
 use App\Http\Controllers\admin\RefereeController;
 use App\Http\Controllers\ProfileController;
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+Route::resource('gallery', GalleryController::class)->except(['show']);
 
 Route::resource('carousels', CarouselController::class);
 
