@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Gallery;
+use Illuminate\Http\Request;
+
+class GalleryController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Gallery::with('event');
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type); 
+        }
+
+        if ($request->filled('event_title')) {
+            $query->whereHas('event', function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->event_title . '%');
+            });
+        }
+
+        $galleries = $query->latest()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $galleries,
+        ]);
+    }
+}

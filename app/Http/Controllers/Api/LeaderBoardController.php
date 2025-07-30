@@ -20,7 +20,7 @@ class LeaderBoardController extends Controller
                     'player_id' => $user->id,
                     'name' => $user->name,
                     'team_name' => $user->player->team->name ?? 'Unassigned',
-                    'avatar_url' => $user->avatar_url ?? '', // add if you have this field
+                    'avatar_url' => $user->avatar_url ?? '',
                     'points' => $user->points,
                 ];
             });

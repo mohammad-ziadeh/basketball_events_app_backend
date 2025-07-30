@@ -21,6 +21,9 @@ class NextEventController extends Controller
         );
     }
 
+
+
+
     public function show(int $id): JsonResponse
     {
         $event = NextEvent::find($id);
@@ -33,8 +36,47 @@ class NextEventController extends Controller
     }
 
 
+    public function eventLeaderboard(int $id): JsonResponse
+    {
+        $event = NextEvent::with('categories.groups.matchups')->find($id);
 
+        if (!$event) {
+            return response()->json(['message' => 'Event not found'], 404);
+        }
 
+        $matchups = $event->categories
+            ->flatMap(fn($cat) => $cat->groups)
+            ->flatMap(fn($group) => $group->matchups);
+
+        $teamPoints = [];
+
+        foreach ($matchups as $matchup) {
+            if ($matchup->team_a_id) {
+                $teamPoints[$matchup->team_a_id] = ($teamPoints[$matchup->team_a_id] ?? 0) + ($matchup->team_a_score ?? 0);
+            }
+            if ($matchup->team_b_id) {
+                $teamPoints[$matchup->team_b_id] = ($teamPoints[$matchup->team_b_id] ?? 0) + ($matchup->team_b_score ?? 0);
+            }
+        }
+
+        $teams = Team::whereIn('id', array_keys($teamPoints))
+            ->get()
+            ->map(function ($team) use ($teamPoints) {
+                return [
+                    'team_id' => $team->id,
+                    'team_name' => $team->name,
+                    'points' => $teamPoints[$team->id] ?? 0,
+                ];
+            })
+            ->sortByDesc('points')
+            ->values()
+            ->all();
+
+        return response()->json([
+            'event' => $event,
+            'leaderboard' => $teams,
+        ]);
+    }
 
 
     public function search(Request $request): JsonResponse
@@ -46,7 +88,7 @@ class NextEventController extends Controller
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', "%{$searchTerm}%")
                     ->orWhere('location', 'like', "%{$searchTerm}%")
-                    ->orWhere('event_code', 'like', "%{$searchTerm}%");  // changed here
+                    ->orWhere('event_code', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -82,7 +124,7 @@ class NextEventController extends Controller
         $suggestions = NextEvent::query()
             ->where('title', 'like', '%' . $query . '%')
             ->orWhere('location', 'like', '%' . $query . '%')
-            ->orWhere('event_code', 'like', '%' . $query . '%')  // changed here
+            ->orWhere('event_code', 'like', '%' . $query . '%')
             ->limit(4)
             ->pluck('title');
 

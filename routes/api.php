@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\SocialStatsController;
 use App\Http\Controllers\Api\NextEventController;
 use App\Http\Resources\NotificationResource;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\GalleryController;
 
 
 /*
@@ -50,6 +51,15 @@ Route::get('/carousel', [CarouselController::class, 'index']);
 
 Route::get('/events', [NextEventController::class, 'index']);
 Route::get('/events/{id}', [NextEventController::class, 'show']);
+Route::get('/events-leaderboard/{id}', [NextEventController::class, 'eventLeaderboard']);
+//
+Route::get('/next-events/search', [NextEventController::class, 'search']);
+Route::get('/next-events/suggestions', [NextEventController::class, 'suggestions']);
+Route::get('/next-events/{id}', [NextEventController::class, 'show']);
+
+
+
+Route::get('/gallery', [GalleryController::class, 'index']);
 
 
 
@@ -85,9 +95,7 @@ Route::get('/leaderboard/players', [LeaderboardController::class, 'playerLeaderb
 Route::get('/leaderboard/teams', [LeaderboardController::class, 'teamLeaderboard']);
 Route::get('/leaderboard/teams/{teamId}/players', [LeaderboardController::class, 'teamPlayers']);
 
-Route::get('/next-events/search', [NextEventController::class, 'search']);
-Route::get('/next-events/suggestions', [NextEventController::class, 'suggestions']);
-Route::get('/next-events/{id}', [NextEventController::class, 'show']);
+
 
 
 Route::get('events/{event}/teams', [NextEventController::class, 'getTeamsAssignedToEvent']);

@@ -49,7 +49,6 @@ class PlayerController extends Controller
 
 
 
-    // Search and suggestions methods
 
     private function getAgeCategory($birthDate)
     {

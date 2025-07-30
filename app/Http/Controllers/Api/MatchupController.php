@@ -38,16 +38,10 @@ class MatchupController extends Controller
             'categories.teams:id,name',
         ])->get(['id', 'title', 'event_code']);
 
-        // Only attach grouped matchups to their corresponding groups
         foreach ($events as $event) {
             foreach ($event->categories as $category) {
-                // Filter matchups belonging to this category
                 $categoryMatchups = $event->matchups->where('category_id', $category->id);
-
-                // Group by group_id only
                 $grouped = $categoryMatchups->whereNotNull('group_id')->groupBy('group_id');
-
-                // Attach matchups to their group
                 $category->groups->each(function ($group) use ($grouped) {
                     $group->matchups = $grouped->get($group->id, collect())->values();
                 });
