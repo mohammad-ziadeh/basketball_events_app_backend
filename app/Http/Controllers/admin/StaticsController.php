@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use App\Models\NextEvent;
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use ConsoleTVs\Charts\Classes\Chartjs\Chart;
 
@@ -11,7 +12,9 @@ class StaticsController extends Controller
 {
     public function index()
     {
-        // 1. Users Male vs Female
+
+
+        // Users Male vs Female
         $maleCount = User::where('gender', 'male')->count();
         $femaleCount = User::where('gender', 'female')->count();
 
@@ -22,13 +25,47 @@ class StaticsController extends Controller
             ->options([
                 'maintainAspectRatio' => false,
                 'responsive' => true,
-                'height' => 300,
-                'width' => 300,
+            ]);
+
+        // Users by Ages
+        $now = Carbon::now();
+
+        $ageRanges = [
+            '0-12'  => [0, 12],
+            '13-18' => [13, 18],
+            '19-25' => [19, 25],
+            '26-35' => [26, 35],
+            '36+'   => [36, null],
+        ];
+
+        $ageGroups = [];
+
+        foreach ($ageRanges as $label => [$min, $max]) {
+            if ($max === null) {
+                $count = User::where('birth_date', '<=', $now->copy()->subYears($min)->endOfDay())->count();
+            } elseif ($min === 0) {
+                $count = User::where('birth_date', '>=', $now->copy()->subYears($max)->startOfDay())->count();
+            } else {
+                $count = User::whereBetween('birth_date', [
+                    $now->copy()->subYears($max)->startOfDay(),
+                    $now->copy()->subYears($min)->endOfDay()
+                ])->count();
+            }
+
+            $ageGroups[$label] = $count;
+        }
+
+        $ageChart = new Chart;
+        $ageChart->labels(array_keys($ageGroups));
+        $ageChart->dataset('Users by Age Group', 'line', array_values($ageGroups))
+            ->backgroundColor('#1A1A1D', '#eeeeee')
+            ->options([
+                'maintainAspectRatio' => false,
+                'responsive' => true,
             ]);
 
 
-        // 2. Number of Events by Month (this month example)
-        // Group events by month name, counting how many per month
+        // Group events by month name
         $eventsByMonth = NextEvent::query()
             ->selectRaw("DATE_FORMAT(start_date, '%M') AS month, COUNT(*) AS total")
             ->groupBy('month')
@@ -43,13 +80,11 @@ class StaticsController extends Controller
         $eventChart->options([
             'maintainAspectRatio' => false,
             'responsive' => true,
-            'height' => 300,
-            'width' => 900,
         ]);
 
 
 
 
-        return view('dashboard', compact('genderChart', 'eventChart'));
+        return view('dashboard', compact('genderChart', 'eventChart', 'ageChart'));
     }
 }
