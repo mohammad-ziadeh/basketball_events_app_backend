@@ -24,7 +24,7 @@
                     <span class="badge bg-secondary">{{ $category->teams->count() }} Team(s)</span>
                 </div>
 
-                <div class="card-body" >
+                <div class="card-body">
                     @if ($category->teams->isEmpty())
                         <div class="alert alert-info mb-0">No teams assigned to this category.</div>
                     @else
@@ -38,13 +38,21 @@
                                             {{ ucfirst($team->pivot->status) }}
                                         </span>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                        data-bs-target="#editStatusModal" data-team-id="{{ $team->id }}"
-                                        data-category-id="{{ $category->id }}"
-                                        data-current-status="{{ $team->pivot->status }}"
-                                        aria-label="Edit status for {{ $team->name }}">
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </button>
+                                    <div style="display: flex; gap: 8px;">
+                                        <a href="{{ route('seePlayers', ['eventId' => $eventId, 'teamId' => $team->id, 'categoryId' => $category->id]) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            Players
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="modal" data-bs-target="#editStatusModal"
+                                            data-team-id="{{ $team->id }}" data-category-id="{{ $category->id }}"
+                                            data-current-status="{{ $team->pivot->status }}"
+                                            aria-label="Edit status for {{ $team->name }}">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </button>
+
+                                    </div>
+
                                 </li>
                             @endforeach
                         </ul>
@@ -53,7 +61,7 @@
             </div>
         @endforeach
     </div>
-    @include('components.pagination', [ 'pag' => $categories,])
+    @include('components.pagination', ['pag' => $categories])
 
     <!-- Edit Status Modal -->
     <div class="modal fade" id="editStatusModal" tabindex="-1" aria-labelledby="editStatusModalLabel"

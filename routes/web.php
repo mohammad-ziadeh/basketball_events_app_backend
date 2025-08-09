@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\NextEventController;
 use App\Http\Controllers\admin\AcceptCategoryTeamController;
 use App\Http\Controllers\admin\MatchupController;
+use App\Http\Controllers\admin\StaticsController;
 use App\Http\Controllers\admin\GroupController;
 use App\Http\Controllers\admin\GalleryController;
 use App\Http\Controllers\admin\CarouselController;
@@ -27,9 +28,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [StaticsController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -76,6 +75,7 @@ Route::get('/admin/category-teams/{category}', [MatchupController::class, 'getTe
 
 Route::get('/event/{eventId}/category-teams', [AcceptCategoryTeamController::class, 'index'])->name('categoryTeams');
 Route::patch('/event/category-teams/{teamId}/{categoryId}', [AcceptCategoryTeamController::class, 'updateStatus'])->name('updateTeamStatus');
+Route::get('/event/{eventId}/category-teams/{teamId}/{categoryId}/players', [AcceptCategoryTeamController::class, 'seePlayers'])->name('seePlayers');
 
 
 

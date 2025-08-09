@@ -41,11 +41,11 @@
                         <button
                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                             <div>
-                                @if(auth()->user())
-    {{ auth()->user()->name }}
-@else
-    Guest
-@endif
+                                @if (auth()->user())
+                                    {{ auth()->user()->name }}
+                                @else
+                                    Guest
+                                @endif
                             </div>
 
                             <div class="ms-1">
@@ -115,8 +115,16 @@
                 {{ __('Matchups') }}
             </x-responsive-nav-link>
 
+            <x-responsive-nav-link :href="route('carousels.index')" :active="request()->routeIs('carousels.index')">
+                {{ __('Carousels') }}
+            </x-responsive-nav-link>
 
-            
+            <x-responsive-nav-link :href="route('gallery.index')" :active="request()->routeIs('gallery.index')">
+                {{ __('Gallery') }}
+            </x-responsive-nav-link>
+
+
+
         </div>
 
         <!-- Responsive Settings Options -->
